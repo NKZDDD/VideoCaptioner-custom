@@ -1,0 +1,64 @@
+{
+  "version": "1.2.2",
+  "unit_and_export_tests": {
+    "tests": 7,
+    "failures": 0,
+    "errors": 0,
+    "passed": true,
+    "saved_profiles": 8
+  },
+  "installer_tests": {
+    "clean_skill_install": true,
+    "isolated_workspace_only": true,
+    "unknown_skill_edit_rejected": true,
+    "software_install_and_repeat": true,
+    "unknown_software_edit_rejected": true,
+    "syntax_passed": true
+  },
+  "structure_checks": [
+    {
+      "skill": "kaka-template-assistant",
+      "flat_frontmatter_fields_valid": true,
+      "name_preserved": true,
+      "description_present": true,
+      "no_scaffold_placeholders": true
+    },
+    {
+      "skill": "字幕模板创建",
+      "flat_frontmatter_fields_valid": true,
+      "name_preserved": true,
+      "description_present": true,
+      "no_scaffold_placeholders": true
+    }
+  ],
+  "bundled_quick_validate": {
+    "executed": false,
+    "reason": "software bundled runtime lacks optional PyYAML; existing flat metadata and preserved names were checked directly"
+  },
+  "actual_render": {
+    "all_decoded_frames_equal": true,
+    "font_check": {
+      "requested": [
+        "方正正中黑简体"
+      ],
+      "available": true
+    },
+    "sample_kind": "illustrative",
+    "automatic_font_reduction": [],
+    "characters": [
+      6,
+      12,
+      14
+    ],
+    "lines": [
+      1,
+      1,
+      1
+    ],
+    "receipt_execution_sha256": "e205333c0eda5c046855b092d721bf053c81b4fdf4c527fc5f205e44ec8a8ee0"
+  },
+  "old_release_1_2_1_preserved": true,
+  "old_unmarked_template_ass_identical": true,
+  "other_computers_verified": false,
+  "customer_template_published": false
+}

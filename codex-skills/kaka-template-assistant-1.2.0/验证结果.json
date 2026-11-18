@@ -1,0 +1,25 @@
+{
+  "skill_version": "1.2.0",
+  "guard_tests": 26,
+  "format_validation": "passed",
+  "installer_initial_repeat": "passed",
+  "installed_files_verified": true,
+  "boundary_render_frame_parity": true,
+  "font_reduction_count": 0,
+  "native_fixture_test": {
+    "passed": true,
+    "fixture": "人工中英及原生词时间形状，译文为固定回放，不调用翻译API",
+    "pages": 3,
+    "translation_calls": 2,
+    "translation_cap_visual": 17,
+    "translation_cap_customer": 45,
+    "native_edges": true,
+    "text_conserved": true,
+    "missing_native_rejected": true,
+    "legacy_unchanged": true
+  },
+  "cloud_tested": false,
+  "real_audio_or_translation_tested": false,
+  "other_computers_tested": false,
+  "customer_template_update": "awaiting_final_preview_confirmation"
+}

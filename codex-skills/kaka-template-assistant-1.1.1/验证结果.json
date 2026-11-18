@@ -1,0 +1,8 @@
+{
+  "version": "1.1.1",
+  "display_name": "字母模板创建",
+  "change": "名称和调用提示更新，功能未改变",
+  "format_validation": "passed",
+  "functional_validation_inherited_from": "1.1.0",
+  "full_render_rerun": false
+}

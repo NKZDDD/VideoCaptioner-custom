@@ -1,0 +1,6 @@
+interface:
+  display_name: "台词提炼"
+  short_description: "从剧本路径提取全部发声台词，按剧名和集数保存共享JSON"
+  default_prompt: "使用 $dialogue-extractor，从我提供的路径提炼各集台词，校验后保存到共享盘Json台词。"
+policy:
+  allow_implicit_invocation: true

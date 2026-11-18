@@ -1,0 +1,6 @@
+interface:
+  display_name: "字母模板创建"
+  short_description: "通过聊天和附件创建修改共享字幕模板，核对执行能力与保存结果"
+  default_prompt: "请用 $kaka-template-assistant（字母模板创建）根据这些材料创建或修改共享字幕模板，并说明实际可执行的规则。"
+policy:
+  allow_implicit_invocation: true

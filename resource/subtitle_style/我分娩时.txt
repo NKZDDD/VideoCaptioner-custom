@@ -1,0 +1,11 @@
+[V4+ Styles]
+Format: Name,Fontname,Fontsize,PrimaryColour,SecondaryColour,OutlineColour,BackColour,Bold,Italic,Underline,StrikeOut,ScaleX,ScaleY,Spacing,Angle,BorderStyle,Outline,Shadow,Alignment,MarginL,MarginR,MarginV,Encoding
+Style: Default,思源黑体 CN Medium,28,&H00FFFFFF,&H000000FF,&H20000000,&H50000000,0,0,0,0,100,100,0,0,1,0.8,0,8,110,110,432,1
+; VideoCaptionerEffect: Default,blur=10,distance=5,angle=-45
+Style: Secondary,思源黑体 CN Medium,28,&H00FFFFFF,&H000000FF,&H20000000,&H50000000,0,0,0,0,100,100,0,0,1,0.8,0,8,110,110,432,1
+; VideoCaptionerEffect: Secondary,blur=10,distance=5,angle=-45
+; VideoCaptionerEnglishSafeWidth: 0.550
+; VideoCaptionerEnglishSemanticWrap: 1
+; VideoCaptionerEnglishNoSqueeze: 1
+; VideoCaptionerEnglishLineWords: 6
+; VideoCaptionerCalibrationCanvas: 1080,1920

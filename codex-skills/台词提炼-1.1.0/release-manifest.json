@@ -1,0 +1,14 @@
+{
+  "version": "1.1.0",
+  "files": {
+    "dialogue-extractor/SKILL.md": "441742bed3f2cfe089a1acf356f3eac4733760a75992accbbf1fd182ff2d9bd3",
+    "dialogue-extractor/agents/openai.yaml": "9ae1738aa792b2770456760ae88e69279e7ce03b5bd0898cc845881d75c7c024",
+    "dialogue-extractor/references/format.md": "920d060f41cf3494ec3ada2e2d63f28feb34370c4f2700f4bf6f63e8d68970ca",
+    "dialogue-extractor/scripts/bilingual_reference.py": "66ad7cb143cd2f93380d5eb891bdbdb285f2bc0c135200b7715b6ec3a442ed89",
+    "dialogue-extractor/scripts/compare_versions.py": "0f200e11b854a64978abe5b9b5bb6012eb624270ae23fc927d87ceda7157c6f0",
+    "dialogue-extractor/scripts/dialogue_json.py": "92d2cbe008e89cd1a6b17a0e6bbe063a7c0d9cf351fcd4607f301d8f68f8a14b",
+    "台词提炼/SKILL.md": "a1582ff9262cf643e98f564a0adccb3b98452752d59a9704c5a1ffc9d05e4f6f",
+    "台词提炼/agents/openai.yaml": "14d1685285424a79a91f3220912fc9ed0a71cf84796f9a7cffa7972dcf8200ab"
+  },
+  "installer_sha256": "1b0c1c7de9a559bdf2f16d896bb471c4335f3806834d618276f85a2e7ea9be26"
+}

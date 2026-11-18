@@ -1,0 +1,13 @@
+{
+  "version": "1.1.1",
+  "files": {
+    "SKILL.md": "b8ec0b63bdf8187fc5912fc4daba400a8ea17068b036f523b78961ca44160066",
+    "agents/openai.yaml": "ac438e791f83e5acef099f55fcc226cb0a9ca28247430d486c6f292f6d138c43",
+    "references/bridge.md": "01bcfe51fcf263e1f9848e3898a09c3e26a1ac106cad3e8bdda6530f92371730",
+    "scripts/render_preview.py": "7f7aee31252ee65d71017d02d296ebe8521ee9bd144621b69792640adf4f84d8",
+    "scripts/style_adapter.py": "a6572fb2bb27656417cd86897a20d3574865db5bab31a54c3034c8f771255e64",
+    "scripts/template_bridge.py": "dd308d652e0f5dbc54e3d28f413aa814cf9087861e4caefc15996dc0ac7a15fb",
+    "scripts/workflow.py": "f49d66a4f71b85332a5c34907393a536c450f47856df6f5ff761705667348be1"
+  },
+  "installer_sha256": "ca8893fbce8faa9ccdc54b645458ed448ce6039d60aee1d90cd4f4b8721551a2"
+}

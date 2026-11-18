@@ -1,0 +1,8 @@
+{
+  "required_app_module": "app/core/bk_asr/asr_data.py",
+  "before_sha256": "be2c3bc89fd8a9735f6695138af1b8cc9f67cef66f527b30a4e5ce04a8ef6dd6",
+  "after_sha256": "ee91af25d96ac4e114f4361105e701da7e50f4f30fc8d85770f392a054c8e45c",
+  "scope": "explicit per-language positions only; text rules unchanged",
+  "old_templates": "ASS output identical without explicit position markers",
+  "installation": "shared app already patched with backup; skill installer does not deploy app code to other software copies"
+}

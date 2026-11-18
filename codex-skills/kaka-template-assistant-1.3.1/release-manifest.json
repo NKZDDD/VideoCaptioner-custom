@@ -1,0 +1,30 @@
+{
+  "version": "1.3.1",
+  "files": {
+    "agents/openai.yaml": "ac438e791f83e5acef099f55fcc226cb0a9ca28247430d486c6f292f6d138c43",
+    "references/bridge.md": "c77a0d9e1cfe36d08d8a4fa119910c1db03396fe6d6e6bcb039bf05ff2c2b785",
+    "references/execution-contract.md": "7fc70b92b5b89a0d71412384fb7750c054465ad1485e12582da53ef68e986884",
+    "scripts/preflight.py": "2cb0e4d83b329f12341b5b48260200a70731beb081ceba024576eb910169b03f",
+    "scripts/render_preview.py": "52ec95ac7cbf8d55f5ddae9d1fc1bee06149b38037de188491a3011263a024c9",
+    "scripts/style_adapter.py": "db450fee0f04ce73796438f5d0df892bf7ebb402142d8c5dd6bbc4239ef47084",
+    "scripts/template_bridge.py": "bd3bf464a148c6b66290cb071551dd9dec5bcf36d8cb211ca8a51fb819c90e3e",
+    "scripts/workflow.py": "934e3965a8846cd5b76bbdc7d4a9be8f7dc14b2bcee740c70d2868d5fee61a73",
+    "SKILL.md": "ffbf629df0bbac0be5c910daac58e2286c05bafdac04946dcba09179c044fbdc"
+  },
+  "approved_predecessor_hashes": {},
+  "auxiliary_files": {
+    "install_chinese_entry.ps1": "e3024de6a80a10426cb12397ad36c24ad94a0edb8811a65952da29b3b86a8ae5",
+    "字幕模板创建/SKILL.md": "b11262b25c5fc0c0180aa5e2ec8a2fe32f233a088175ec2b798e09f2aec08151",
+    "字幕模板创建/agents/openai.yaml": "8176daa961d29fba679f9e345dc7cb85e899b8cf3dd68b2001b9acfc79b1f0ba"
+  },
+  "approved_auxiliary_predecessor_hashes": {
+    "字幕模板创建/SKILL.md": [
+      "5d7b573720b97455ea7fd9eb4a9ac8adc5149097597a8462ab23788e5dd5cbf1",
+      "bf0bc0e4a9871f8dc9398f19a0ada86d0d54c2dc8f873e4236e4446e42bc559c"
+    ],
+    "字幕模板创建/agents/openai.yaml": [
+      "7f7e27a478a0c14edf64b058a5341241b8f7d125f27a89fb86aa26cb63d78ef2"
+    ]
+  },
+  "installer_sha256": "6cc532476969041a5ee68c06ebbbd0397fa236928d1306a5376cc9180de39fd7"
+}

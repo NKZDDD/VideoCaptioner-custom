@@ -1,0 +1,22 @@
+{
+  "version": "1.2.0",
+  "files": {
+    "SKILL.md": "18af9031c61c75cd5c1a87256669ac2df3229ddb6fa77d00495e02b70e7aa6e3",
+    "agents/openai.yaml": "ac438e791f83e5acef099f55fcc226cb0a9ca28247430d486c6f292f6d138c43",
+    "references/bridge.md": "bbb50038c048097a46c6a7f3df1454959579fb3215d8de883c9bef256f319964",
+    "scripts/preflight.py": "dc6c0063b9cf277db8d992fdef0ca3d46620ac34357d254a638f879984cd697d",
+    "scripts/render_preview.py": "bb9b2b0747baba1e5ae309a470c33fe8b60732ae3a65c63cac3baf82d6e04c55",
+    "scripts/style_adapter.py": "5d2f7eefdcb83df43ddad66155cc163974ab3b44b18c3d208f768fdd7c59c05a",
+    "scripts/template_bridge.py": "6ead60fa2cfb78243bfb6fae7f417278ca7ee4baac540d6626a595b25c5148a1",
+    "scripts/workflow.py": "f49d66a4f71b85332a5c34907393a536c450f47856df6f5ff761705667348be1"
+  },
+  "approved_predecessor_hashes": {
+    "scripts/style_adapter.py": "5d2f7eefdcb83df43ddad66155cc163974ab3b44b18c3d208f768fdd7c59c05a"
+  },
+  "auxiliary_files": {
+    "install_chinese_entry.ps1": "e8d1c77e2bf123e68862f0009928a8f0a6b917cce4250d16dc55f7a830c5dd9d",
+    "字幕模板创建/SKILL.md": "2f8597b997860442a218b30ede9d10e638d5acfd704cddc5ea4790f8a7e6eff3",
+    "字幕模板创建/agents/openai.yaml": "7f7e27a478a0c14edf64b058a5341241b8f7d125f27a89fb86aa26cb63d78ef2"
+  },
+  "installer_sha256": "fc298a8a477435846f73a68f8f1ee67d9cc4c0e0943a305afc31df51aa97afb4"
+}

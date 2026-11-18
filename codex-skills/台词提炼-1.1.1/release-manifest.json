@@ -1,0 +1,11 @@
+{
+  "version": "1.1.1",
+  "files": {
+    "台词提炼/SKILL.md": "12d560071fd97b009ec0828da2b8c53304c43208994807aeef4721f431977986",
+    "台词提炼/agents/openai.yaml": "574dc97c998a53abee5bf806c352ef3c26427014c8d1809f74a3617bb2b8ccc4",
+    "台词提炼/references/format.md": "920d060f41cf3494ec3ada2e2d63f28feb34370c4f2700f4bf6f63e8d68970ca",
+    "台词提炼/scripts/bilingual_reference.py": "66ad7cb143cd2f93380d5eb891bdbdb285f2bc0c135200b7715b6ec3a442ed89",
+    "台词提炼/scripts/compare_versions.py": "0f200e11b854a64978abe5b9b5bb6012eb624270ae23fc927d87ceda7157c6f0",
+    "台词提炼/scripts/dialogue_json.py": "92d2cbe008e89cd1a6b17a0e6bbe063a7c0d9cf351fcd4607f301d8f68f8a14b"
+  }
+}

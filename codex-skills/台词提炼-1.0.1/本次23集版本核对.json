@@ -1,0 +1,484 @@
+{
+  "episodes": 23,
+  "case_punctuation_equal_episodes": 23,
+  "joined_exact_episodes": 23,
+  "results": [
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 1,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 2,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 3,
+      "ordinary_segments": [
+        1,
+        2,
+        3
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 4,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 5,
+      "ordinary_segments": [
+        1,
+        2,
+        3
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 6,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 7,
+      "ordinary_segments": [
+        1,
+        2,
+        3
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 8,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 9,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 10,
+      "ordinary_segments": [
+        1,
+        2,
+        3
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 11,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 12,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 13,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 14,
+      "ordinary_segments": [
+        1,
+        2,
+        3
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 15,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 16,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 17,
+      "ordinary_segments": [
+        1,
+        2,
+        3
+      ],
+      "r03_segments": [
+        1,
+        2
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 18,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 19,
+      "ordinary_segments": [
+        1,
+        2
+      ],
+      "r03_segments": [
+        1
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 20,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 21,
+      "ordinary_segments": [
+        1,
+        2,
+        3
+      ],
+      "r03_segments": [
+        1,
+        2
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 22,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "fragments_exact": false,
+      "joined_comparison_exact": true,
+      "same_case_punctuation_and_characters_ignoring_whitespace": true,
+      "word_sequence_equal": true,
+      "non_whitespace_changes": [],
+      "note": "分段数组严格比较；join只为比较增加分隔空格。忽略空白的比较仍区分大小写、标点。规范化仅用于诊断，输出必须保留所选原文。",
+      "episode": 23,
+      "ordinary_segments": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "r03_segments": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  ]
+}

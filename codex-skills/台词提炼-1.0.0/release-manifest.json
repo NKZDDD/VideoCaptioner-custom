@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "files": {
+    "dialogue-extractor/SKILL.md": "506e2b9040c116ad038c32ce4b7ed17b8c6ee153d607cbe1938488a9bc21d921",
+    "dialogue-extractor/agents/openai.yaml": "9ae1738aa792b2770456760ae88e69279e7ce03b5bd0898cc845881d75c7c024",
+    "dialogue-extractor/references/format.md": "02d790caaab43cdd8bfe9aa8db874a0f1f9c13f2ed515d5789bcec24b1a60f99",
+    "dialogue-extractor/scripts/dialogue_json.py": "fc5e8c907ff631cd838d8938b7b4986f274a24d41ba9a095524537f18f348777",
+    "台词提炼/SKILL.md": "a1582ff9262cf643e98f564a0adccb3b98452752d59a9704c5a1ffc9d05e4f6f",
+    "台词提炼/agents/openai.yaml": "14d1685285424a79a91f3220912fc9ed0a71cf84796f9a7cffa7972dcf8200ab"
+  },
+  "installer_sha256": "43164541026f7439987d27e3d9719d82ff1c07f6d35f54f930267fd44e928627"
+}

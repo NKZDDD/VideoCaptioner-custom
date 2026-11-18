@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "guard_tests": 8,
+  "installer_initial_repeat": "passed",
+  "first_episode_real_prompt_fragments": 47,
+  "actual_app_import_verified": true,
+  "episode_version_word_order_comparisons": 23,
+  "different_episode_word_sequences": 0,
+  "note": "版本比较忽略大小写与标点；双语中文参考尚未接入软件校译",
+  "default_output": "\\\\Desktop-8roqjoa\\素材共享盘\\Json台词",
+  "production_dialogue_files_published": false,
+  "other_computers_tested": false
+}

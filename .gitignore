@@ -1,0 +1,32 @@
+# Runtime, local state and customer data
+/runtime/
+/AppData/
+/VideoCaptioner/
+/work-dir/
+/startup/
+/outputs/
+/.cache/
+/patch-backups/
+/capcut_style_patch_backups/
+/resource/bin/
+/resource/sftp_deps/
+/resource/zh_alignment/deps/
+/resource/zh_alignment/model/
+*.onnx
+*.bin
+__pycache__/
+*.py[cod]
+*.pyd
+*.bak*
+*.log
+*.jsonl
+.env
+.env.*
+settings.json
+team_services.json
+*.key
+*.pem
+
+# Duplicate archives and historical source backups
+*.zip
+*.shadow_backup

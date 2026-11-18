@@ -1,0 +1,9 @@
+{
+  "required_app_module": "app/core/utils/ass_effects.py",
+  "before_sha256": "9eca606d64b79a67ab75bd2f73383a5ab9d7e3eabe337bfcc73104115558f7e3",
+  "after_sha256": "148c283e66642fe784f27ea230efd7c272e4fa760c1810cdac0da6d04e6ad4ea",
+  "scope": "explicit per-style solid_shadow marker; typography, text and old unmarked styles unchanged",
+  "old_templates": "saved profile legacy ASS exports verified identical",
+  "installation": "explicit install_software_patch.ps1 with backup; skill installer does not silently deploy software code",
+  "runtime_receipts": "re-render after app or skill runtime hashes change"
+}
