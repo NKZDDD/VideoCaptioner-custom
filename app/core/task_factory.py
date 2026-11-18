@@ -19,6 +19,7 @@ from app.core.entities import (
     SynthesisConfig,
     SynthesisTask,
     TranscribeConfig,
+    TranscribeModelEnum,
     TranscribeTask,
     TranscriptAndSubtitleTask,
 )
@@ -52,30 +53,38 @@ class TaskFactory:
         require_shared_profile(profile)
         runtime = runtime_config(profile)
 
-        # 根据是否需要分段来决定是否需要词级时间戳
+        model = profile_value(profile, 'transcribe_model')
+        native_timing = any(
+            '; VideoCaptionerOriginalLanguage: ' + lang in profile.get('style_template', '')
+            for lang in ('hi', 'ar')
+        )
 
         # 获取文件名
         file_name = Path(file_path).stem
 
         # 构建输出路径
         if need_next_task:
-            need_word_time_stamp = profile_value(profile, 'need_split') or any('; VideoCaptionerOriginalLanguage: ' + lang in profile.get('style_template', '') for lang in ('hi', 'ar'))
+            need_word_time_stamp = profile_value(profile, 'need_split') or native_timing
             output_path = str(
                 WORK_PATH
                 / (file_name + '_' + hashlib.sha256(str(Path(file_path).resolve()).lower().encode('utf-8')).hexdigest()[:8] + '_' + uuid.uuid4().hex[:8])
                 / "subtitle"
-                / f"【原始字幕】{file_name}-{profile_value(profile, 'transcribe_model').value}-{profile_value(profile, 'transcribe_language').value}.srt"
+                / f"【原始字幕】{file_name}-{model.value}-{profile_value(profile, 'transcribe_language').value}.srt"
             )
         else:
             need_word_time_stamp = False
             output_path = str(Path(file_path).parent / f"{file_name}.srt")
 
-        if profile.get('text_source_mode') in ('strict', 'hybrid', 'script_correct'):
+        script_timing = profile.get('text_source_mode') in ('strict', 'hybrid', 'script_correct')
+        if script_timing:
             need_word_time_stamp = True
+        use_cache = runtime.use_asr_cache.value
+        if model != TranscribeModelEnum.BIJIAN and (script_timing or native_timing):
+            use_cache = False
         config = TranscribeConfig(
-            transcribe_model=profile_value(profile, 'transcribe_model'),
+            transcribe_model=model,
             transcribe_language=LANGUAGES[profile_value(profile, 'transcribe_language').value],
-            use_asr_cache=False if profile.get('text_source_mode') in ('strict', 'hybrid', 'script_correct') or any('; VideoCaptionerOriginalLanguage: ' + lang in profile.get('style_template', '') for lang in ('hi', 'ar')) else runtime.use_asr_cache.value,
+            use_asr_cache=use_cache,
             need_word_time_stamp=need_word_time_stamp,
             multilingual_asr_base=runtime.multilingual_asr_base.value,
             multilingual_asr_key=runtime.multilingual_asr_key.value,

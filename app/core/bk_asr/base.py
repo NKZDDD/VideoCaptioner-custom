@@ -61,8 +61,8 @@ class BaseASR:
 
                 return ASRData(segments)
 
-        audio_duration = self._get_audio_duration_seconds()
         if self.RATE_LIMIT_ENABLED:
+            audio_duration = self._get_audio_duration_seconds()
             self._check_rate_limit(audio_duration)
 
         resp_data = self._run(callback, **kwargs)

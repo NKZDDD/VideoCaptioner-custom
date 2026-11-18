@@ -1,15 +1,16 @@
 import json
-import logging
 import time
 from typing import Optional
 
 import requests
 
+from app.config import CACHE_PATH
+from app.core.concurrency import shared_lock
+
 from ..utils.logger import setup_logger
 from .asr_data import ASRDataSeg
 from .base import BaseASR
 from . import bcut_recovery as recovery
-from app.core.concurrency import shared_lock
 
 logger = setup_logger("bcut_asr")
 
@@ -32,7 +33,8 @@ class InvalidBcutTaskError(RuntimeError):
 class BcutASR(BaseASR):
     """必剪 语音识别接口"""
 
-    RATE_LIMIT_ENABLED = True
+    # B counts newly accepted tasks, not cache reads or queries for an existing task.
+    RATE_LIMIT_STATE_FILE = CACHE_PATH / "bcut_rate_limit.json"
 
     headers = {
         "User-Agent": "Bilibili/1.0.0 (https://www.bilibili.com)",
@@ -44,12 +46,11 @@ class BcutASR(BaseASR):
         audio_path: str | bytes,
         use_cache: bool = True,
         need_word_time_stamp: bool = False,
+        cancel_requested=None,
     ):
         super().__init__(audio_path, use_cache=use_cache)
         self.session = requests.Session()
-        # This domestic provider must not inherit a workstation VPN/proxy route.
-        # Other providers retain their own sessions and proxy configuration.
-        self.session.trust_env = False
+        self.cancel_requested = cancel_requested
         self.task_id: Optional[str] = None
         self.__etags: list[str] = []
 
@@ -60,11 +61,13 @@ class BcutASR(BaseASR):
         self.__per_size: Optional[int] = None
         self.__clips: Optional[int] = None
 
-        self.__etags: Optional[list[str]] = []
         self.__download_url: Optional[str] = None
-        self.task_id: Optional[str] = None
 
         self.need_word_time_stamp = need_word_time_stamp
+
+    def _check_cancelled(self):
+        if self.cancel_requested and self.cancel_requested():
+            raise RuntimeError("B 接口转录已取消")
 
     def upload(self) -> None:
         """申请上传"""
@@ -80,6 +83,8 @@ class BcutASR(BaseASR):
             }
         )
 
+        self._check_cancelled()
+        self.__etags.clear()
         resp = self.session.post(API_REQ_UPLOAD, data=payload, headers=self.headers, timeout=(10,120))
         self._check_response(resp,'upload_request')
         resp = resp.json()
@@ -101,6 +106,7 @@ class BcutASR(BaseASR):
     def __upload_part(self) -> None:
         """上传音频数据"""
         for clip in range(self.__clips):
+            self._check_cancelled()
             start_range = clip * self.__per_size
             end_range = (clip + 1) * self.__per_size
             logger.info(f"开始上传分片{clip}: {start_range}-{end_range}")
@@ -111,6 +117,8 @@ class BcutASR(BaseASR):
              timeout=(10,120))
             self._check_response(resp,'upload_part')
             etag = resp.headers.get("Etag")
+            if not etag:
+                raise ValueError(f"B 接口上传分片 {clip} 缺少 ETag，无法确认上传")
             self.__etags.append(etag)
             logger.info(f"分片{clip}上传成功: {etag}")
 
@@ -125,6 +133,7 @@ class BcutASR(BaseASR):
                 "model_id": "8",
             }
         )
+        self._check_cancelled()
         resp = self.session.post(API_COMMIT_UPLOAD, data=data, headers=self.headers, timeout=(10,120))
         self._check_response(resp,'upload_commit')
         resp = resp.json()
@@ -133,6 +142,7 @@ class BcutASR(BaseASR):
 
     def create_task(self) -> str:
         """开始创建转换任务"""
+        self._check_cancelled()
         resp = self.session.post(
             API_CREATE_TASK,
             json={"resource": self.__download_url, "model_id": "8"},
@@ -140,15 +150,25 @@ class BcutASR(BaseASR):
          timeout=(10,120))
         self._check_response(resp,'create_task')
         resp = resp.json()
-        self.task_id = resp["data"]["task_id"]
-        recovery.save_job(self.file_binary,self.task_id)
+        self.task_id = recovery.save_job(self.file_binary, resp["data"]["task_id"])
         logger.info(f"任务已创建: {self.task_id}")
         return self.task_id
+
+    def _submit(self, callback):
+        self._check_cancelled()
+        duration = self._get_audio_duration_seconds()
+        self._check_rate_limit(duration)
+        callback(0, "上传中")
+        self.upload()
+        callback(40, "创建任务中")
+        self.create_task()
+        self._record_rate_limit_usage(duration)
 
     def result(self, task_id: Optional[str] = None):
         """查询转换结果"""
         recovery.require_available()
         recovery.pace_query()
+        self._check_cancelled()
         query_started=time.time()
         resp = self.session.get(
             API_QUERY_RESULT,
@@ -160,20 +180,22 @@ class BcutASR(BaseASR):
         if str(payload.get('code')) == '1500806':
             recovery.forget_invalid_probe(task_id or self.task_id,query_started)
             raise InvalidBcutTaskError('B 接口业务拒绝：code=1500806；无效的任务ID')
-        if payload.get('code') not in (None,0):
+        if payload.get('code') not in (None, 0, "0"):
             raise RuntimeError('B 接口业务拒绝：code='+str(payload.get('code'))+'；'+str(payload.get('message') or payload.get('msg') or '')[:160])
         data=payload.get('data')
-        if not isinstance(data,dict):raise ValueError('B 接口结果响应缺少任务状态，已保留原任务')
+        if not isinstance(data, dict) or data.get("state") is None:
+            raise ValueError('B 接口结果响应缺少任务状态，已保留原任务')
         recovery.clear(query_started)
         return data
 
     def _run(self, callback=None, **kwargs):
         callback=callback or (lambda value,message:None)
+        self._check_cancelled()
         cached=recovery.load_result(self.file_binary) if self.use_cache else None
         if cached is not None:
             callback(100,'复用共享B接口成功结果；无需访问接口')
             return cached
-        with recovery.provider_queue(callback):
+        with recovery.provider_queue(callback, self._check_cancelled):
             return self._run_serial(callback,**kwargs)
 
     def _check_response(self,resp,stage,task_id=None):
@@ -187,9 +209,9 @@ class BcutASR(BaseASR):
         # One pending receipt per exact audio payload. A failed result query
         # must not cause the next manual retry to upload and create again.
         with shared_lock(recovery.job_path(self.file_binary),wait_seconds=60):
+            self._check_cancelled()
             cached=recovery.load_result(self.file_binary) if self.use_cache else None
             if cached is not None:return cached
-            recovery.require_available()
             pending=recovery.load_job(self.file_binary)
             self.task_id=pending.get('task_id')
             recovered=pending.get('completed_result')
@@ -200,25 +222,26 @@ class BcutASR(BaseASR):
                 recovery.complete_job(self.file_binary)
                 callback(100,'已恢复此前完成的B接口结果；未重新上传')
                 return recovered
+            recovery.require_available()
             probe=recovery.blocked_task()
             if probe and probe!=self.task_id:
                 callback(20,'B接口恢复检查：查询此前任务，不重新上传')
                 try:
                     probe_response=self.result(probe)
                     if not recovery.preserve_probe_result(probe,probe_response):
-                        raise RuntimeError('B接口此前提交任务仍在处理；本任务暂未新上传，请稍后恢复')
+                        logger.info('B 接口已恢复响应，旧任务仍在处理，保留其回执供原素材续查')
                 except InvalidBcutTaskError:
                     logger.warning('此前B接口探测任务已无效，不再以该ID阻止当前任务')
             resumed_id=self.task_id
             replacement_used=False
             if not self.task_id:
-                callback(0,'上传中');self.upload()
-                callback(40,'创建任务中');self.create_task()
+                self._submit(callback)
             else:
                 logger.info('恢复已提交的B接口任务：%s；未重新上传',self.task_id)
             callback(60,'查询已提交的B接口转录结果')
             deadline=time.monotonic()+500
             while time.monotonic()<deadline:
+                self._check_cancelled()
                 try:response=self.result()
                 except InvalidBcutTaskError:
                     invalid_id=self.task_id
@@ -229,9 +252,9 @@ class BcutASR(BaseASR):
                     replacement_used=True
                     recovery.require_available()
                     callback(40,'此前B接口任务ID已无效；已归档，重新提交一次')
-                    self.upload();self.create_task()
+                    self._submit(callback)
                     continue
-                if response.get('state')==4:
+                if str(response.get('state')) == '4':
                     raw=response.get('result')
                     result=json.loads(raw) if isinstance(raw,str) else raw
                     if not isinstance(result,dict) or not isinstance(result.get('utterances'),list):

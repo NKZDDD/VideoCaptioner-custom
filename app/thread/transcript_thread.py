@@ -89,9 +89,12 @@ class TranscriptThread(QThread):
                 temp_file.name,
                 self.task.transcribe_config,
                 callback=self.progress_callback,
+                cancel_requested=self.isInterruptionRequested,
             )
 
             # 保存字幕文件
+            if self.isInterruptionRequested():
+                raise RuntimeError('转录已取消')
             output_path = Path(self.task.output_path)
             output_path.parent.mkdir(parents=True, exist_ok=True)
             asr_data.to_srt(save_path=str(output_path))

@@ -11,7 +11,7 @@ from app.core.bk_asr.asr_data import ASRData
 from app.core.entities import TranscribeConfig, TranscribeModelEnum
 
 
-def transcribe(audio_path: str, config: TranscribeConfig, callback=None) -> ASRData:
+def transcribe(audio_path: str, config: TranscribeConfig, callback=None, *, cancel_requested=None) -> ASRData:
     """
     使用指定的转录配置对音频文件进行转录
 
@@ -48,7 +48,9 @@ def transcribe(audio_path: str, config: TranscribeConfig, callback=None) -> ASRD
     }
 
     # 根据不同模型添加特定参数
-    if config.transcribe_model == TranscribeModelEnum.MULTILINGUAL_ASR:
+    if config.transcribe_model == TranscribeModelEnum.BIJIAN:
+        asr_args["cancel_requested"] = cancel_requested
+    elif config.transcribe_model == TranscribeModelEnum.MULTILINGUAL_ASR:
         asr_args.update({
             "use_cache": False,
             "base_url": config.multilingual_asr_base,

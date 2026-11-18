@@ -25,14 +25,21 @@ def audio_key(audio):
 def job_path(audio):
  directory=ROOT/'pending';directory.mkdir(parents=True,exist_ok=True)
  return directory/(audio_key(audio)+'.json')
+def normalize_task_id(task_id):
+ if type(task_id) not in (int, str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,128}',str(task_id)):
+  raise ValueError('B接口返回无效任务编号')
+ return str(task_id)
+
 def load_job(audio):
  path=job_path(audio);value=read(path)
- if value and (not re.fullmatch(r'[A-Za-z0-9_-]{8,128}',str(value.get('task_id',''))) or value.get('audio_sha256')!=path.stem):
-  raise RuntimeError('B接口恢复记录不匹配，已停止新提交')
+ if value:
+  if value.get('audio_sha256')!=path.stem:raise RuntimeError('B接口恢复记录不匹配，已停止新提交')
+  value['task_id']=normalize_task_id(value.get('task_id'))
  return value
 def save_job(audio,task_id):
- if not isinstance(task_id,str) or not re.fullmatch(r'[A-Za-z0-9_-]{8,128}',task_id):raise ValueError('B接口返回无效任务编号')
+ task_id=normalize_task_id(task_id)
  path=job_path(audio);atomic_text(path,json.dumps({'task_id':task_id,'created_at':time.time(),'audio_sha256':path.stem},ensure_ascii=False))
+ return task_id
 def complete_job(audio):job_path(audio).unlink(missing_ok=True)
 
 def result_path(audio):return ROOT/'results'/(audio_key(audio)+'.json')
@@ -50,7 +57,7 @@ def save_result(audio,result):
  atomic_text(result_path(audio),json.dumps(dict(schema='bcut-result/v1',audio_sha256=audio_key(audio),saved_at=time.time(),result=result),ensure_ascii=False))
 
 def preserve_probe_result(task_id,response):
- if response.get('state')!=4:return False
+ if str(response.get('state'))!='4':return False
  raw=response.get('result');result=json.loads(raw) if isinstance(raw,str) else raw
  if not isinstance(result,dict) or not isinstance(result.get('utterances'),list):raise ValueError('B接口探测完成结果无效；未提交新任务')
  for path in (ROOT/'pending').glob('*.json'):
@@ -63,11 +70,12 @@ def preserve_probe_result(task_id,response):
  return True
 
 @contextlib.contextmanager
-def provider_queue(callback):
+def provider_queue(callback, check_cancelled):
  """One full B request lifecycle per shared installation, released on crash."""
  from app.core.concurrency import ResourceBusyError
  ROOT.mkdir(parents=True,exist_ok=True);notified=False
  while True:
+  check_cancelled()
   stack=contextlib.ExitStack()
   try:stack.enter_context(shared_lock(ROOT/'provider-queue',wait_seconds=0))
   except ResourceBusyError:
@@ -75,7 +83,9 @@ def provider_queue(callback):
    if not notified:callback(0,'等待共享B接口前一个转录完成；不会重复提交');notified=True
    time.sleep(.25);continue
   break
- try:yield
+ try:
+  check_cancelled()
+  yield
  finally:stack.close()
 
 def remaining():return max(0,int(read(ROOT/'service.json').get('blocked_until',0)-time.time()+0.999))

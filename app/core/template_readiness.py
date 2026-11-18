@@ -17,7 +17,8 @@ def inspect_profile(profile):
  protected=any('; VideoCaptionerOriginalLanguage: '+lang in style for lang in ('ar','hi')) or str(s.get('transcribe_language','')).casefold() in ('arabic','ar','hindi','hi')
  translate=bool(s.get('need_translate'));layout=str(s.get('subtitle_layout','仅原文'))
  if translate and not str(s.get('target_language','')).strip():errors.append('启用翻译但未指定目标语言')
- if not translate and layout in ('仅译文','译文在上'):errors.append('当前排列需要译文，但模板未启用翻译')
+ # The two ordering options fall back to the original when there is no translation.
+ if not translate and layout=='仅译文':errors.append('当前排列需要译文，但模板未启用翻译')
  if p.get('delivery_separate_languages')==1 and not translate:errors.append('模板设置了双语分别计数，但未启用翻译')
  if p.get('delivery_separate_languages')==1 and layout in ('仅原文','仅译文'):errors.append('双语分别排版与单语交付排列冲突')
  if p.get('delivery_separate_languages')==1:
