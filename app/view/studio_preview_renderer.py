@@ -62,7 +62,7 @@ class ExactPreviewRenderer(QObject):
         # PYStand launchers are not necessarily Python command-line hosts.
         candidates=[Path(sys.prefix)/'python.exe',Path(getattr(sys,'_base_executable',sys.executable)),Path(sys.executable)]
         interpreter=next((p for p in candidates if p.is_file() and p.stem.lower() in ('python','pythonw','python3')),Path(sys.executable))
-        process.setProgram(str(interpreter))
+        process.setProgram(sys.executable if sys.platform == "darwin" else str(interpreter))
         process.setArguments([str(Path(__file__).with_name('studio_preview_render.py')),str(job)])
         self.watchdog.start();process.start()
 

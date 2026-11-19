@@ -3,7 +3,10 @@ import sys
 from enum import Enum
 from pathlib import Path
 
-import vlc
+if sys.platform == "darwin":
+    from app.vendor import vlc
+else:
+    import vlc
 from PyQt5.QtCore import QObject, Qt, QTimer, QUrl, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QVBoxLayout, QWidget
@@ -301,7 +304,10 @@ class MediaPlayer(MediaPlayerBase):
 
     def setVideoOutput(self, output: QObject) -> None:
         if isinstance(output, QObject) and hasattr(output, "winId"):
-            self._player.set_hwnd(output.winId())
+            if sys.platform == "darwin":
+                self._player.set_nsobject(int(output.winId()))
+            else:
+                self._player.set_hwnd(output.winId())
 
     def hasMedia(self):
         """检查是否有媒体文件加载"""

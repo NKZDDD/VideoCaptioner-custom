@@ -1,5 +1,6 @@
 import hashlib
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -51,7 +52,7 @@ from app.core.entities import (
 )
 from app.core.utils.logger import setup_logger
 from app.thread.file_download_thread import FileDownloadThread
-from app.thread.modelscope_download_thread import ModelscopeDownloadThread
+from app.core.bk_asr.whisper_cpp import whisper_program_name
 
 logger = setup_logger("whisper_download")
 
@@ -129,8 +130,16 @@ WHISPER_CPP_MODELS = [
 
 
 def check_whisper_cpp_exists():
-    """检查WhisperCpp程序是否存在"""
-    return True, []
+    """检查当前平台的 Whisper 程序。"""
+    path = shutil.which(whisper_program_name())
+    return bool(path), [path] if path else []
+
+
+def model_download_thread(model):
+    return FileDownloadThread(
+        model["mirrorLink"], str(MODEL_PATH / model["value"]),
+        checksum="sha-1=" + model["sha"], mirrors=(model["downloadLink"],),
+    )
 
 
 class DownloadDialog(MessageBoxBase):
@@ -196,7 +205,7 @@ class DownloadDialog(MessageBoxBase):
         self.progress_label.show()
         self.download_button.setEnabled(False)
 
-        self.download_thread = FileDownloadThread(model["mirrorLink"], save_path)
+        self.download_thread = model_download_thread(model)
         self.download_thread.progress.connect(self.update_progress)
         self.download_thread.finished.connect(self.download_finished)
         self.download_thread.error.connect(self.download_error)
@@ -239,13 +248,12 @@ class WhisperCppDownloadDialog(MessageBoxBase):
     # 添加类变量跟踪下载状态
     is_downloading = False
 
-    def __init__(self, parent=None, setting_widget=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
         self.widget.setMinimumWidth(600)
         self.program_download_thread = None
         self.model_download_thread = None
         self._setup_ui()
-        self.setting_widget = setting_widget
 
     def _setup_ui(self):
         """设置UI"""
@@ -276,7 +284,8 @@ class WhisperCppDownloadDialog(MessageBoxBase):
             program_status.setStyleSheet("color: green")
             layout.addWidget(program_status)
         else:
-            desc_label = BodyLabel(self.tr("未下载 WhisperCpp 程序"), self)
+            hint = "未找到 whisper-cli，请运行 brew install whisper.cpp" if sys.platform == "darwin" else "未找到 whisper-cpp 程序"
+            desc_label = BodyLabel(self.tr(hint), self)
             layout.addWidget(desc_label)
 
     def _setup_model_section(self, layout):
@@ -440,19 +449,7 @@ class WhisperCppDownloadDialog(MessageBoxBase):
                 download_btn.setText(self.tr("重新下载"))
                 download_btn.setEnabled(True)
 
-            # 获取当前下载的模型信息
-            model = WHISPER_CPP_MODELS[row]
-
-            # 更新主设置对话框的模型选择
-            if self.setting_widget:
-                try:
-                    self.setting_widget.model_card.comboBox.clear()  # 清空现有选项
-                    # 重新添加所有已下载的模型
-                    for m in WHISPER_CPP_MODELS:
-                        if os.path.exists(os.path.join(MODEL_PATH, m["value"])):
-                            self.setting_widget.model_card.comboBox.addItem(m["label"])
-                except Exception as e:
-                    logger.error(f"更新模型选择失败: {e}")
+            cfg.set(cfg.whisper_model, WhisperModelEnum(model["label"].lower()))
 
             InfoBar.success(
                 self.tr("下载成功"),
@@ -473,9 +470,7 @@ class WhisperCppDownloadDialog(MessageBoxBase):
             self.progress_bar.hide()
             self.progress_label.hide()
 
-        self.model_download_thread = FileDownloadThread(
-            model["mirrorLink"], os.path.join(MODEL_PATH, model["value"])
-        )
+        self.model_download_thread = model_download_thread(model)
         self.model_download_thread.progress.connect(_on_model_download_progress)
         self.model_download_thread.finished.connect(_on_model_download_finished)
         self.model_download_thread.error.connect(_on_model_download_error)
@@ -541,17 +536,6 @@ class WhisperCppSettingWidget(QWidget):
             self.setting_group,
         )
 
-        # 检查未下载的模型并从下拉框中移除
-        for i in range(self.model_card.comboBox.count() - 1, -1, -1):
-            model_text = self.model_card.comboBox.itemText(i).lower()
-            model_configs = {
-                model["label"].lower(): model for model in WHISPER_CPP_MODELS
-            }
-            model_config = model_configs.get(model_text)
-            if model_config and (MODEL_PATH / model_config["value"]).exists():
-                continue
-            self.model_card.comboBox.removeItem(i)
-
         # 语言选择
         self.language_card = ComboBoxSettingCard(
             cfg.transcribe_language,
@@ -600,5 +584,5 @@ class WhisperCppSettingWidget(QWidget):
 
     def show_download_dialog(self):
         """显示下载对话框"""
-        download_dialog = WhisperCppDownloadDialog(self.window(), self)
+        download_dialog = WhisperCppDownloadDialog(self.window())
         download_dialog.show()

@@ -30,7 +30,7 @@ def is_protected(profile):
 def can_edit(profile):
     if not is_protected(profile):return True
     try:return device_identity() in read_policy().get('owner_devices',[])
-    except OSError:return False
+    except (ImportError, OSError):return False
 
 def assert_template_write(profile):
     if not can_edit(profile):raise RuntimeError('阿拉伯模板受保护：当前电脑只有使用权限，不能修改、停用、改名或覆盖；请由模板所有者处理')

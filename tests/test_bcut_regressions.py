@@ -1,4 +1,5 @@
 import json
+import sys
 import tempfile
 import threading
 import time
@@ -67,7 +68,11 @@ class BcutRegressionTests(unittest.TestCase):
         from app.core.entities import TranscribeModelEnum
         from app.core.task_factory import TaskFactory
 
-        profile = {"settings": preset_defaults(), "style_template": ""}
+        settings = preset_defaults()
+        expected = TranscribeModelEnum.WHISPER_CPP if sys.platform == "darwin" else TranscribeModelEnum.BIJIAN
+        self.assertEqual(settings["transcribe_model"], expected.value)
+        settings["transcribe_model"] = TranscribeModelEnum.BIJIAN.value
+        profile = {"settings": settings, "style_template": ""}
         self.assertFalse(profile["settings"]["need_translate"])
         self.assertEqual(profile["settings"]["subtitle_layout"], "译文在上")
         with patch("app.core.utils.team_services.refresh_for_new_task"):

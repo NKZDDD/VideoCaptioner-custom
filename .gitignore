@@ -1,4 +1,5 @@
 # Runtime, local state and customer data
+/.venv/
 /runtime/
 /AppData/
 /VideoCaptioner/

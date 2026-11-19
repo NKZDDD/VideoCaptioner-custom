@@ -1,9 +1,8 @@
-import os
 import time
 from pathlib import Path
 
-from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QTextCursor
+from PyQt5.QtCore import Qt, QTimer, QUrl
+from PyQt5.QtGui import QDesktopServices, QTextCursor
 from PyQt5.QtWidgets import QTextEdit, QVBoxLayout, QWidget, QHBoxLayout
 from qfluentwidgets import Dialog, FluentStyleSheet, TextEdit, isDarkTheme, PushButton
 
@@ -157,4 +156,4 @@ class LogWindow(QWidget):
 
     def open_log_folder(self):
         """打开日志文件所在文件夹"""
-        os.startfile(str(LOG_PATH))
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(LOG_PATH)))

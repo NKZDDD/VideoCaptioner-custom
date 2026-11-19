@@ -2,6 +2,7 @@ import logging
 import os
 import hashlib
 import json
+import sys
 import tempfile
 import uuid
 from pathlib import Path
@@ -30,7 +31,9 @@ APPDATA_PATH = ROOT_PATH.parent / "AppData"
 SHARED_APPDATA_PATH = APPDATA_PATH
 SESSION_ID = uuid.uuid4().hex
 _installation = hashlib.sha256(str(ROOT_PATH.parent.resolve()).lower().encode('utf-8')).hexdigest()[:12]
-LOCAL_PROFILE_PATH = Path(os.environ.get('LOCALAPPDATA') or tempfile.gettempdir()) / 'VideoCaptioner' / _installation
+profile_root = (Path.home() / 'Library' / 'Application Support' if sys.platform == 'darwin'
+                else Path(os.environ.get('LOCALAPPDATA') or tempfile.gettempdir()))
+LOCAL_PROFILE_PATH = profile_root / 'VideoCaptioner' / _installation
 SESSION_PATH = LOCAL_PROFILE_PATH / 'sessions' / SESSION_ID
 SESSION_PATH.mkdir(parents=True, exist_ok=True)
 WORK_PATH = SESSION_PATH / 'work-dir'
@@ -69,12 +72,12 @@ FASER_WHISPER_PATH = BIN_PATH / "Faster-Whisper-XXL"
 LOG_LEVEL = logging.INFO
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
-# 环境变量添加 bin 路径，添加到PATH开头以优先使用
-os.environ["PATH"] = str(BIN_PATH) + os.pathsep + os.environ["PATH"]
-os.environ["PATH"] = str(FASER_WHISPER_PATH) + os.pathsep + os.environ["PATH"]
-
-# 添加 VLC 路径
-os.environ["PYTHON_VLC_MODULE_PATH"] = str(BIN_PATH / "vlc")
+if sys.platform == "darwin":
+    # Finder and desktop launchers may omit Homebrew from PATH.
+    os.environ["PATH"] = os.pathsep.join([os.environ.get("PATH", ""), "/opt/homebrew/bin", "/usr/local/bin"])
+else:
+    os.environ["PATH"] = os.pathsep.join([str(FASER_WHISPER_PATH), str(BIN_PATH), os.environ["PATH"]])
+    os.environ["PYTHON_VLC_MODULE_PATH"] = str(BIN_PATH / "vlc")
 
 # 创建路径
 for p in [CACHE_PATH, LOG_PATH, WORK_PATH, MODEL_PATH]:

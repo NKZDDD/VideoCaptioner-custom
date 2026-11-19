@@ -1,5 +1,6 @@
 """Readiness checks only: no upload, inference, automatic binding or rule changes."""
 import copy,hashlib,json,tempfile
+import shutil
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -136,6 +137,15 @@ def inspect_task(task,context=None):
             except (OSError,ValueError):error('合成字幕','缺少有效的同名ASS字幕','在字幕编辑器保存ASS后重新检查；不会重新转录')
         if kind in (BatchTaskType.TRANSCRIBE,BatchTaskType.TRANS_SUB,BatchTaskType.FULL_PROCESS) and not checkpoint and not profile.get('cloud_full_process'):
             tc=TaskFactory.create_transcribe_task(task.file_path,need_next_task=True,customer_profile=profile).transcribe_config
+            if tc.transcribe_model == TranscribeModelEnum.WHISPER_CPP:
+                from app.core.bk_asr.whisper_cpp import find_model, whisper_program_name
+                for program in ("ffmpeg", whisper_program_name()):
+                    if not shutil.which(program):
+                        error('本地转录', f'找不到 {program}', '安装 FFmpeg 和 whisper.cpp 后重新检查')
+                try:
+                    find_model(tc.whisper_model)
+                except (ValueError, FileNotFoundError) as exc:
+                    error('Whisper 模型', str(exc), '在服务设置中下载并选择模型')
             if tc.transcribe_model==TranscribeModelEnum.MULTILINGUAL_ASR:
                 if not valid_url(tc.multilingual_asr_base) or not str(getattr(tc,'multilingual_asr_model','')).strip():
                     error('转录服务','云端转录地址或模型配置不完整','在服务设置中核对当前转录接口配置')

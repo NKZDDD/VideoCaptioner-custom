@@ -1,4 +1,5 @@
 import os
+import sys
 
 import psutil
 from PyQt5.QtCore import QSize, QThread, QUrl
@@ -37,16 +38,17 @@ class MainWindow(FluentWindow):
         self.batchProcessInterface = BatchProcessInterface(self)
         signalBus.customer_template_applied.connect(self.onCustomerTemplateApplied)
 
-        # 初始化版本管理器
-        self.versionManager = VersionManager()
-        self.versionManager.newVersionAvailable.connect(self.onNewVersion)
-        self.versionManager.announcementAvailable.connect(self.onAnnouncement)
+        if sys.platform != "darwin":
+            # 初始化版本管理器
+            self.versionManager = VersionManager()
+            self.versionManager.newVersionAvailable.connect(self.onNewVersion)
+            self.versionManager.announcementAvailable.connect(self.onAnnouncement)
 
-        # 创建版本检查线程
-        self.versionThread = QThread()
-        self.versionManager.moveToThread(self.versionThread)
-        self.versionThread.started.connect(self.versionManager.performCheck)
-        self.versionThread.start()
+            # 创建版本检查线程
+            self.versionThread = QThread()
+            self.versionManager.moveToThread(self.versionThread)
+            self.versionThread.started.connect(self.versionManager.performCheck)
+            self.versionThread.start()
 
         # 初始化导航界面
         self.initNavigation()

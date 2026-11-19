@@ -27,7 +27,7 @@ from app.common.signal_bus import signalBus
 from app.components.EditComboBoxSettingCard import EditComboBoxSettingCard
 from app.components.LineEditSettingCard import LineEditSettingCard
 from app.config import AUTHOR, FEEDBACK_URL, HELP_URL, RELEASE_URL, VERSION, YEAR
-from app.core.entities import LLMServiceEnum, TranscribeModelEnum, TranslatorServiceEnum, TranscribeLanguageEnum
+from app.core.entities import LLMServiceEnum, TranscribeModelEnum, TranslatorServiceEnum, TranscribeLanguageEnum, WhisperModelEnum
 from app.core.utils.test_opanai import get_openai_models, test_openai
 from app.thread.version_manager_thread import VersionManager
 from app.components.MySettingCard import ComboBoxSettingCard as MyComboBoxSettingCard
@@ -97,6 +97,15 @@ class SettingInterface(ScrollArea):
             parent=self.transcribeGroup,
         )
 
+        self.whisperModelCard = ComboBoxSettingCard(
+            cfg.whisper_model, FIF.ROBOT, self.tr("Whisper 本地模型"), self.tr("选择已下载的模型"),
+            texts=[model.value for model in WhisperModelEnum], parent=self.transcribeGroup,
+        )
+        self.whisperDownloadCard = PushSettingCard(
+            self.tr("管理模型"), FIF.DOWNLOAD, self.tr("Whisper 模型管理"),
+            self.tr("下载模型或打开模型文件夹"), self.transcribeGroup,
+        )
+        self.whisperDownloadCard.clicked.connect(self.showWhisperModels)
         self.__createMultilingualASRCards()
 
         # LLM配置卡片
@@ -274,10 +283,18 @@ class SettingInterface(ScrollArea):
         )
         self.multilingualASRCards.append(self.multilingualASRLanguageCard)
 
+    def showWhisperModels(self):
+        from app.components.WhisperCppSettingWidget import WhisperCppDownloadDialog
+        WhisperCppDownloadDialog(self.window()).show()
+
     def __updateMultilingualASRCards(self, *_):
         enabled = cfg.transcribe_model.value == TranscribeModelEnum.MULTILINGUAL_ASR
         for card in self.multilingualASRCards:
             card.setVisible(enabled)
+        local = cfg.transcribe_model.value == TranscribeModelEnum.WHISPER_CPP
+        self.whisperModelCard.setVisible(local)
+        self.whisperDownloadCard.setVisible(local)
+        self.multilingualASRLanguageCard.setVisible(enabled or local)
         self.transcribeGroup.adjustSize()
         self.scrollWidget.adjustSize()
 
@@ -554,6 +571,8 @@ class SettingInterface(ScrollArea):
 
         # 添加转录配置卡片
         self.transcribeGroup.addSettingCard(self.transcribeModelCard)
+        self.transcribeGroup.addSettingCard(self.whisperModelCard)
+        self.transcribeGroup.addSettingCard(self.whisperDownloadCard)
         for card in self.multilingualASRCards:
             self.transcribeGroup.addSettingCard(card)
         self.__updateMultilingualASRCards()

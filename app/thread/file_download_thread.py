@@ -1,11 +1,13 @@
+from collections import deque
 import os
 import platform
 import shutil
 import subprocess
+from pathlib import Path
 
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 
-from app.config import CACHE_PATH
+from app.config import CACHE_PATH, SESSION_ID
 from app.core.utils.logger import setup_logger
 
 logger = setup_logger("download_thread")
@@ -15,9 +17,11 @@ class FileDownloadThread(QThread):
     finished = pyqtSignal()
     error = pyqtSignal(str)
     
-    def __init__(self, url, save_path):
+    def __init__(self, url, save_path, checksum=None, mirrors=()):
         super().__init__()
+        self.checksum = checksum
         self.url = url
+        self.mirrors = mirrors
         self.save_path = save_path
         self.process = None
 
@@ -25,6 +29,9 @@ class FileDownloadThread(QThread):
         try:
             # 创建缓存下载目录
             temp_dir = CACHE_PATH / "aria2c_download_cache"
+            if self.checksum:
+                # Keep a verified replacement on the same volume as the active model.
+                temp_dir = Path(self.save_path).parent / ".downloads" / SESSION_ID
             temp_dir.mkdir(parents=True, exist_ok=True)
             temp_file = temp_dir / os.path.basename(self.save_path)
             
@@ -45,17 +52,23 @@ class FileDownloadThread(QThread):
                 '--continue=true',       # 开启断点续传
                 '--auto-file-renaming=false',
                 '--allow-overwrite=true',
-                '--check-certificate=false',                f'--dir={temp_dir}',
+                f'--dir={temp_dir}',
                 f'--out={temp_file.name}',
-                self.url
+                self.url, *self.mirrors,
             ]
             
+            if self.checksum:
+                cmd.insert(1, "--checksum=" + self.checksum)
+            else:
+                cmd.insert(1, "--check-certificate=false")
+
             # 根据操作系统设置不同的 subprocess 参数
             subprocess_args = {
                 'stdout': subprocess.PIPE,
-                'stderr': subprocess.PIPE,
+                'stderr': subprocess.STDOUT,
                 'universal_newlines': True,
-                'encoding': 'utf-8'
+                'encoding': 'utf-8',
+                'errors': 'replace'
             }
             
             # 仅在 Windows 系统上添加 CREATE_NO_WINDOW 标志
@@ -69,12 +82,9 @@ class FileDownloadThread(QThread):
                 **subprocess_args
             )
             
-            while True:
-                if self.process.poll() is not None:
-                    break
-                    
-                line = self.process.stdout.readline()
-                
+            tail = deque(maxlen=8)
+            for line in self.process.stdout:
+                tail.append(line.rstrip())
                 if '[#' in line and ']' in line:
                     try:
                         # 解析类似 "[#40ca1b 2.4MiB/74MiB(3%) CN:2 DL:3.9MiB ETA:18s]" 的格式
@@ -93,13 +103,16 @@ class FileDownloadThread(QThread):
                     except Exception as e:
                         pass
                         
-            if self.process.returncode == 0:
+            if self.process.wait() == 0:
                 # 下载完成后移动文件到目标位置
                 os.makedirs(os.path.dirname(self.save_path), exist_ok=True)
-                shutil.move(str(temp_file), self.save_path)
+                if self.checksum:
+                    os.replace(temp_file, self.save_path)
+                else:
+                    shutil.move(str(temp_file), self.save_path)
                 self.finished.emit()
             else:
-                error = self.process.stderr.read()
+                error = "\n".join(tail)
                 logger.error("下载失败: %s", error)
                 self.error.emit(f"{self.tr('下载失败')}: {error}")
                 

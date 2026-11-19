@@ -2,6 +2,7 @@
 import copy
 import datetime
 import json
+import sys
 import tempfile
 import uuid
 from pathlib import Path
@@ -48,7 +49,10 @@ class StudioVideoWidget(QWidget):
         self.waiting_label.setStyleSheet('color:#c1d1da;background:#11191f;padding:20px;font-size:13px;')
         self.frame_stack.addWidget(self.waiting_label);self.frame_stack.setMinimumHeight(260)
         layout.addWidget(self.frame_stack,1)
-        self.backend.set_hwnd(int(self.surface.winId()))
+        if sys.platform == "darwin":
+            self.backend.set_nsobject(int(self.surface.winId()))
+        else:
+            self.backend.set_hwnd(int(self.surface.winId()))
         self.backend.video_set_mouse_input(False);self.backend.video_set_key_input(False)
         controls=QHBoxLayout();controls.setSpacing(8);controls.setContentsMargins(7,0,7,0)
         self.play_button=ToolButton(self);self.play_button.setFixedSize(36,34)

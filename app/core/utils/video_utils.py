@@ -26,7 +26,7 @@ def video2audio(input_file: str, output: str = "") -> bool:
         "-i",
         input_file,
         "-map",
-        "0:a",
+        "0:a:0",
         "-ac",
         "1",
         "-ar",

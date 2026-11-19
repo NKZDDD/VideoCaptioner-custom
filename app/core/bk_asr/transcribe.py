@@ -64,6 +64,7 @@ def transcribe(audio_path: str, config: TranscribeConfig, callback=None, *, canc
             {
                 "language": config.transcribe_language,
                 "whisper_model": config.whisper_model,
+                "cancel_requested": cancel_requested,
             }
         )
     elif config.transcribe_model == TranscribeModelEnum.WHISPER_API:

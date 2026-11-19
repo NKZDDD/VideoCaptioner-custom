@@ -1,9 +1,9 @@
-import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
-import time
+from collections import deque
 from pathlib import Path
 
 from ...config import MODEL_PATH
@@ -14,39 +14,41 @@ from .base import BaseASR
 logger = setup_logger("whisper_asr")
 
 
+def whisper_program_name():
+    return "whisper-cli" if sys.platform == "darwin" else "whisper-cpp"
+
+
+def find_model(model):
+    if not model:
+        raise ValueError("请选择 Whisper 模型")
+    name = getattr(model, "value", model)
+    exact = MODEL_PATH / f"ggml-{name}.bin"
+    if exact.is_file():
+        return exact
+    if sys.platform != "darwin":
+        # Portable Windows installations may use a renamed or quantized model.
+        for candidate in sorted(MODEL_PATH.glob(f"*ggml*{name}*.bin")):
+            if candidate.is_file():
+                return candidate
+    raise FileNotFoundError(f"找不到模型 {exact}，请在 WhisperCpp 的「管理模型」中下载")
+
+
 class WhisperCppASR(BaseASR):
     def __init__(
-        self,
-        audio_path,
-        language="en",
-        whisper_cpp_path="whisper-cpp",
-        whisper_model=None,
-        use_cache: bool = False,
-        need_word_time_stamp: bool = False,
+        self, audio_path, language="en", whisper_cpp_path=None, whisper_model=None,
+        use_cache=False, need_word_time_stamp=False, cancel_requested=None,
     ):
-        super().__init__(audio_path, False)
-        assert os.path.exists(audio_path), f"音频文件 {audio_path} 不存在"
-        assert audio_path.endswith(".wav"), f"音频文件 {audio_path} 必须是WAV格式"
-
-        # 如果指定了 whisper_model，则在 models 目录下查找对应模型
-        if whisper_model:
-            models_dir = Path(MODEL_PATH)
-            model_files = list(models_dir.glob(f"*ggml*{whisper_model}*.bin"))
-            if not model_files:
-                raise ValueError(
-                    f"在 {models_dir} 目录下未找到包含 '{whisper_model}' 的模型文件"
-                )
-            model_path = str(model_files[0])
-            logger.info(f"找到模型文件: {model_path}")
-        else:
-            raise ValueError("whisper_model 不能为空")
-
-        self.model_path = model_path
-        self.whisper_cpp_path = Path(whisper_cpp_path)
+        super().__init__(str(audio_path), use_cache=False)
+        self.model_path = find_model(whisper_model)
+        program = str(whisper_cpp_path or whisper_program_name())
+        self.whisper_cpp_path = shutil.which(program)
+        if not self.whisper_cpp_path:
+            hint = "，请运行 brew install whisper.cpp" if sys.platform == "darwin" else ""
+            raise FileNotFoundError(f"找不到 Whisper 程序 {program}{hint}")
+        self.const_me = sys.platform == "win32" and Path(program).stem.lower() != "whisper-cli"
         self.need_word_time_stamp = need_word_time_stamp
-        self.language = language
-
-        self.process = None
+        self.language = language or "auto"
+        self.cancel_requested = cancel_requested
 
     def _make_segments(self, resp_data: str) -> list[ASRDataSeg]:
         asr_data = ASRData.from_srt(resp_data)
@@ -64,159 +66,63 @@ class WhisperCppASR(BaseASR):
                 filtered_segments.append(seg)
         return filtered_segments
 
-    def _build_command(
-        self, wav_path, output_path, is_const_me_version: bool
-    ) -> list[str]:
-        """构建 whisper-cpp 命令行参数
-
-        Args:
-            wav_path: 输入的WAV文件路径
-            output_path: 输出文件路径
-            is_const_me_version: 是否为 const_me 版本
-
-        Returns:
-            list[str]: 命令行参数列表
-        """
-        # 构建基础命令参数列表
-        whisper_params = [
-            str(self.whisper_cpp_path),
-            "-m",
-            str(self.model_path),
-            "-f",
-            str(wav_path),
-            "-l",
-            self.language,
-            "--output-srt",
-        ]
-
-        # 根据版本添加额外参数
-        if not is_const_me_version:
-            whisper_params.extend(
-                ["--no-gpu", "--output-file", str(output_path.with_suffix(""))]
-            )
-
-        # 中文模式下添加提示语
+    def _build_command(self, wav_path, output_path):
+        command = [self.whisper_cpp_path, "-m", str(self.model_path), "-f", str(wav_path),
+                   "-l", self.language, "--output-srt"]
+        if not self.const_me:
+            command.extend(["--output-file", str(output_path.with_suffix(""))])
+            if sys.platform != "darwin":
+                command.append("--no-gpu")
+            if self.need_word_time_stamp:
+                command.extend(["-ml", "1"])
         if self.language == "zh":
-            whisper_params.extend(
-                ["--prompt", "你好，我们需要使用简体中文，以下是普通话的句子。"]
-            )
+            command.extend(["--prompt", "你好，我们需要使用简体中文，以下是普通话的句子。"])
+        return command
 
-        return whisper_params
-
-    def _run(self, callback=None) -> str:
-        if callback is None:
-            callback = lambda x, y: None
-
-        temp_dir = Path(tempfile.gettempdir()) / "bk_asr"
-        temp_dir.mkdir(parents=True, exist_ok=True)
-
-        is_const_me_version = True if os.name == "nt" else False
-
-        # 使用 with 语句管理临时文件的生命周期
-        with tempfile.TemporaryDirectory(dir=temp_dir) as temp_path:
-            temp_dir = Path(temp_path)
-            wav_path = temp_dir / "audio.wav"
-            output_path = wav_path.with_suffix(".srt")
-
-            try:
-                # 把self.audio_path 复制到 wav_path
-                shutil.copy2(self.audio_path, wav_path)
-
-                # 使用新的 _build_command 方法构建命令
-                whisper_params = self._build_command(
-                    wav_path, output_path, is_const_me_version
-                )
-                logger.info("完整命令行参数: %s", " ".join(whisper_params))
-
-                # 启动进程
-                self.process = subprocess.Popen(
-                    whisper_params,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True,
-                    encoding="utf-8",
-                )
-                # 获取音频时长
-                total_duration = self.get_audio_duration(self.audio_path) or 600
-                logger.info("音频总时长: %d 秒", total_duration)
-
-                # 处理输出和进度
-                full_output = []
-                while True:
+    def _run(self, callback=None):
+        total = self._get_audio_duration_seconds()
+        with tempfile.TemporaryDirectory(prefix="whisper-") as folder:
+            output = Path(folder) / "audio.srt"
+            wav = Path(self.audio_path)
+            if self.const_me:
+                # Const-me writes next to the input file.
+                wav = Path(folder) / "audio.wav"
+                shutil.copyfile(self.audio_path, wav)
+            command = self._build_command(wav, output)
+            logger.info("Whisper: %s", command)
+            log = Path(folder) / "whisper.log"
+            tail = deque(maxlen=8)
+            with log.open("wb") as writer, log.open("r", encoding="utf-8", errors="replace") as reader:
+                with subprocess.Popen(command, stdout=writer, stderr=subprocess.STDOUT) as process:
                     try:
-                        line = self.process.stdout.readline()
-                    except Exception as e:
-                        break
-                    if not line:
-                        continue
-
-                    full_output.append(line)
-
-                    # 简化的进度处理
-                    if " --> " in line and "[" in line:
-                        try:
-                            time_str = line.split("[")[1].split(" -->")[0].strip()
-                            current_time = sum(
-                                float(x) * y
-                                for x, y in zip(
-                                    reversed(time_str.split(":")), [1, 60, 3600]
-                                )
-                            )
-                            progress = int(min(current_time / total_duration * 100, 98))
-                            callback(progress, f"{progress}% 正在转换")
-                        except (ValueError, IndexError):
-                            continue
-                # 等待进程完成
-                stdout, stderr = self.process.communicate()
-                if self.process.returncode != 0:
-                    raise RuntimeError(f"WhisperCPP 执行失败: {stderr}")
-
-                callback(100, "转换完成")
-
-                # 读取结果文件
-                srt_path = output_path
-                if not srt_path.exists():
-                    raise RuntimeError(f"输出文件未生成: {srt_path}")
-
-                return srt_path.read_text(encoding="utf-8")
-
-            except Exception as e:
-                logger.exception("处理失败")
-                raise RuntimeError(f"生成 SRT 文件失败: {str(e)}")
-
-    def _get_key(self):
-        return f"{self.crc32_hex}-{self.need_word_time_stamp}-{self.model_path}-{self.language}"
-
-    def get_audio_duration(self, filepath: str) -> int:
-        try:
-            cmd = ["ffmpeg", "-i", filepath]
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                encoding="utf-8",
-                errors="replace",
-                creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
-            )
-            info = result.stderr
-            # 提取时长
-            if duration_match := re.search(r"Duration: (\d+):(\d+):(\d+\.\d+)", info):
-                hours, minutes, seconds = map(float, duration_match.groups())
-                duration_seconds = hours * 3600 + minutes * 60 + seconds
-                return int(duration_seconds)
-            return 600
-        except Exception as e:
-            logger.exception("获取音频时长时出错: %s", str(e))
-            return 600
-
-
-if __name__ == "__main__":
-    # 简短示例
-    asr = WhisperCppASR(
-        audio_path="audio.mp3",
-        model_path="models/ggml-tiny.bin",
-        whisper_cpp_path="bin/whisper-cpp.exe",
-        language="en",
-        need_word_time_stamp=True,
-    )
-    asr_data = asr._run(callback=print)
+                        while True:
+                            if self.cancel_requested and self.cancel_requested():
+                                raise RuntimeError("转录已取消")
+                            done = process.poll() is not None
+                            for line in reader:
+                                tail.append(line.rstrip())
+                                match = re.search(r"--> (\d+):(\d+):(\d+\.\d+)", line)
+                                if match and callback and total:
+                                    h, m, s = map(float, match.groups())
+                                    progress = min(98, int((h * 3600 + m * 60 + s) / total * 100))
+                                    callback(progress, f"{progress}% 正在转录")
+                            if done:
+                                break
+                            try:
+                                process.wait(timeout=0.25)
+                            except subprocess.TimeoutExpired:
+                                pass
+                    finally:
+                        if process.poll() is None:
+                            process.kill()
+                    if process.returncode:
+                        detail = "\n".join(tail)
+                        raise RuntimeError(f"Whisper 转录失败（退出码 {process.returncode}）\n{detail}")
+            if self.const_me and not output.exists():
+                output = Path(str(wav) + ".srt")
+            if not output.is_file():
+                raise RuntimeError("Whisper 没有生成 SRT 字幕\n" + "\n".join(tail))
+            text = output.read_text(encoding="utf-8-sig")
+            if callback:
+                callback(100, "转录完成")
+            return text

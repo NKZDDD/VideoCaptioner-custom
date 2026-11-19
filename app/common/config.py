@@ -1,4 +1,5 @@
 # coding:utf-8
+import sys
 from enum import Enum
 
 from PyQt5.QtCore import QLocale
@@ -139,7 +140,7 @@ class Config(QConfig):
     transcribe_model = OptionsConfigItem(
         "Transcribe",
         "TranscribeModel",
-        TranscribeModelEnum.BIJIAN,
+        TranscribeModelEnum.WHISPER_CPP if sys.platform == "darwin" else TranscribeModelEnum.BIJIAN,
         OptionsValidator(TranscribeModelEnum),
         EnumSerializer(TranscribeModelEnum),
     )

@@ -40,6 +40,7 @@ from qfluentwidgets import (
     FluentIcon as FIF,
 )
 import os
+import sys
 
 from app.thread.batch_process_thread import (
     BatchProcessThread,
@@ -175,7 +176,8 @@ class BatchProcessInterface(QWidget):
         # 任务类型选择
         self.task_type_combo = ComboBox()
         self.task_type_combo.addItems([str(task_type) for task_type in BatchTaskType])
-        self.task_type_combo.setCurrentText(str(BatchTaskType.FULL_PROCESS))
+        default_task = BatchTaskType.TRANSCRIBE if sys.platform == "darwin" else BatchTaskType.FULL_PROCESS
+        self.task_type_combo.setCurrentText(str(default_task))
         self.task_type_combo.currentIndexChanged.connect(self.update_backend_hint)
 
         # 控制按钮
